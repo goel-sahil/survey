@@ -10,6 +10,9 @@ class Survey extends Model
     use HasFactory;
 
     protected $table = 'survey';
+    public $timestamps = false;
+
+    public $dates = ['Date_Submission'];
 
     /**
      * The attributes that are mass assignable.

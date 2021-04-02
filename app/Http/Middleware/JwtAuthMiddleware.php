@@ -19,7 +19,7 @@ class JwtAuthMiddleware
         if (auth()->check()) {
             $user = auth()->user();
 
-            if (!$user->status) {
+            if (!$user->Status) {
                 return response()->json(['message' => 'Your account is inactivated by Admin!'], 401);
             }
 

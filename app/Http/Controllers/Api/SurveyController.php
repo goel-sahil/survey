@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Survey;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Validator;
 
 class SurveyController extends Controller
 {
@@ -21,7 +23,7 @@ class SurveyController extends Controller
             'S/0_D/0_W/0' => 'bail|required|string|min:1|max:10',
             'Occupation' => 'bail|required|string|min:1|max:10',
             'Address' => 'bail|required|string|min:1:max:1000',
-            'Mobile_number' => 'bail|required|string|min:7|max:15',
+            'Mobile_Number' => 'bail|required|string|min:7|max:15',
             'Anual_Income' => 'bail|required|numeric|min:0',
             'Intrested' => 'bail|required|integer|min:0|max:1',
             'Extend_Required' => 'bail|required|string|min:1|max:20',
@@ -49,9 +51,10 @@ class SurveyController extends Controller
         $survey->Status = 1;
         // $survey->Date_Submission = now();
         $survey->ulb = auth()->user()->ULB_Name;
-        $survey->survey_user = auth()->id();
+        $survey->survey_user = auth()->user()->Id;
 
         if ($survey->save()) {
+            $survey->refresh();
             return response()->json(['message' => 'Survey has been added successfully!', 'data' => $survey], 200);
         }
         return response()->json(['message' => 'Something went wrong!'], 400);
