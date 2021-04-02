@@ -61,4 +61,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function district_relation()
+    {
+        return $this->belongsTo(District::class, 'District', 'id');
+    }
+
+    public function ulb()
+    {
+        return $this->belongsTo(Ulb::class, 'ULB_Name');
+    }
 }

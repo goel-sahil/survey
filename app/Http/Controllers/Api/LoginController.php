@@ -63,6 +63,8 @@ class LoginController extends Controller
      */
     protected function respondWithToken($token)
     {
+        $user = auth()->user();
+        $user->load(['ulb', 'district_relation']);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
