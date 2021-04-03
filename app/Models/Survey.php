@@ -35,4 +35,54 @@ class Survey extends Model
         'Date_Submission',
         'Status'
     ];
+
+    /**
+     * Get the ULB info
+     *
+     * @return void
+     */
+    public function ulb_name()
+    {
+        return $this->belongsTo(Ulb::class, 'ulb', 'id');
+    }
+
+    /**
+     * District relationship
+     *
+     * @return void
+     */
+    public function district_relation()
+    {
+        return $this->belongsTo(District::class, 'district', 'id');
+    }
+
+    /**
+     * User relationship
+     *
+     * @return void
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'survey_user', 'Id');
+    }
+
+    /**
+     * Extent relationship
+     *
+     * @return void
+     */
+    public function extent_relation()
+    {
+        return $this->belongsTo(Extent::class, 'Extend_Required', 'id');
+    }
+
+    /**
+     * Distance relationship
+     *
+     * @return void
+     */
+    public function distance_relation()
+    {
+        return $this->belongsTo(Distance::class, 'Distance', 'id');
+    }
 }

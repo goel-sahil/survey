@@ -18,12 +18,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Login
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
+// Dropdown
 Route::get('districts', [DropdownController::class, 'getDistricts']);
 Route::get('ulb-name', [DropdownController::class, 'getUlbName']);
+Route::get('distances', [DropdownController::class, 'getDistances']);
+Route::get('extents', [DropdownController::class, 'getExtents']);
 
 Route::middleware('jwtauth')->group(function () {
+    // Surveys
     Route::post('survey', [SurveyController::class, 'addSurvey']);
+    Route::get('survey', [SurveyController::class, 'getSurvey']);
+
+    // Survey OTP
+    Route::post('survey/otp', [SurveyController::class, 'createOTP']);
+    Route::post('survey/verify-otp', [SurveyController::class, 'verifyOTP']);
 });
