@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTextMessageJob;
 use App\Models\Otp;
 use App\Models\Survey;
 use App\Models\User;
@@ -11,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Validator;
+use Twilio;
 
 class SurveyController extends Controller
 {
@@ -46,7 +48,7 @@ class SurveyController extends Controller
             ->first();
 
         if (!$otp) {
-            return response()->json(['message' => 'OTP entered is invalid!'], 400);
+            return response()->json(['message' => 'The entered OTP is invalid!'], 400);
         }
 
         try {
@@ -135,6 +137,10 @@ class SurveyController extends Controller
             'otp' => CommonRepository::genrateRandomNumber()
         ]);
 
+        // Send message
+        $message = "Your OTP to create survey is: {$otp->otp}.";
+        SendTextMessageJob::dispatch($request->input('Mobile_Number'), $message);
+
         return response()->json(['message' => 'OTP has been sent successfully!', 'data' => $otp]);
     }
 
@@ -161,7 +167,7 @@ class SurveyController extends Controller
             ->first();
 
         if (!$otp) {
-            return response()->json(['message' => 'OTP entered is invalid!'], 400);
+            return response()->json(['message' => 'The entered OTP is invalid!'], 400);
         }
 
         return response()->json(['message' => 'OTP has been verified!', 'data' => $otp]);
