@@ -20,7 +20,7 @@ class RegisterController extends Controller
     {
         $validator =  Validator::make($request->all(), [
             'Name' => 'bail|required|string|min:2|max:200',
-            'Mobile_number' => 'bail|required|string|min:10|max:15|unique:users,Mobile_number',
+            'Mobile_number' => 'bail|required|string|min:10|max:10|unique:users,Mobile_number',
             'Email' => 'bail|required|string|email|max:220|unique:users,Email',
             'District' => 'bail|required|integer|min:1|exists:districts,id',
             'ULB_Name' => 'bail|required|integer|min:1|exists:ulb,id',
@@ -47,7 +47,7 @@ class RegisterController extends Controller
         $user->Status = 1;
 
         if ($user->save()) {
-            return response()->json(['message' => 'You have registered successfully!', 'data' => $user], 200);
+            return response()->json(['message' => 'Successfully registered!', 'data' => $user], 200);
         }
         return response()->json(['message' => 'Something went wrong!'], 400);
     }

@@ -29,7 +29,7 @@ class SurveyController extends Controller
             'S/0_D/0_W/0' => 'bail|required|string|min:1|max:10',
             'Occupation' => 'bail|required|string|min:1|max:10',
             'Address' => 'bail|required|string|min:1:max:1000|unique:survey,Address',
-            'Mobile_Number' => 'bail|required|string|min:7|max:15',
+            'Mobile_Number' => 'bail|required|string|min:10|max:10',
             'Anual_Income' => 'bail|required|numeric|min:0',
             'Intrested' => 'bail|required|integer|min:0|max:1',
             'Extend_Required' => 'bail|required|integer|min:1|exists:extent,id',
@@ -121,7 +121,7 @@ class SurveyController extends Controller
     public function createOTP(Request $request)
     {
         $validator =  Validator::make($request->all(), [
-            'Mobile_Number' => 'bail|required|string|min:7|max:15',
+            'Mobile_Number' => 'bail|required|string|min:10|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -153,7 +153,7 @@ class SurveyController extends Controller
     public function verifyOTP(Request $request)
     {
         $validator =  Validator::make($request->all(), [
-            'Mobile_Number' => 'bail|required|string|min:7|max:15',
+            'Mobile_Number' => 'bail|required|string|min:10|max:10',
             'otp' => 'bail|required|integer|min:111111|max:999999',
         ]);
 
