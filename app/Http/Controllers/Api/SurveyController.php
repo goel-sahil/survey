@@ -45,6 +45,7 @@ class SurveyController extends Controller
         $otp = Otp::where('phone_number', $request->input('Mobile_Number'))
             ->where('otp', $request->input('otp'))
             ->where('user_id', auth()->id())
+            ->where('type', 1)
             ->first();
 
         if (!$otp) {
@@ -79,6 +80,7 @@ class SurveyController extends Controller
 
             return response()->json(['message' => 'Survey has been added successfully!', 'data' => $survey], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => 'Something went wrong!'], 400);
         }
     }
@@ -164,6 +166,7 @@ class SurveyController extends Controller
         $otp = Otp::where('phone_number', $request->input('Mobile_Number'))
             ->where('otp', $request->input('otp'))
             ->where('user_id', auth()->id())
+            ->where('type', 1)
             ->first();
 
         if (!$otp) {

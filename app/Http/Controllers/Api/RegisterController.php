@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTextMessageJob;
+use App\Models\Otp;
 use App\Models\User;
+use App\Repositories\CommonRepository;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 
@@ -33,22 +38,95 @@ class RegisterController extends Controller
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
 
-        $user = new User($request->only(
-            'Name',
-            'Mobile_number',
-            'Email',
-            'District',
-            'ULB_Name',
-            'Secretariat_number',
-            'username',
-        ));
+        $otp = Otp::where('phone_number', $request->input('Mobile_number'))
+            ->where('otp', $request->input('otp'))
+            ->where('type', 2)
+            ->first();
 
-        $user->password = Hash::make($request->input('password'));
-        $user->Status = 1;
-
-        if ($user->save()) {
-            return response()->json(['message' => 'Successfully registered!', 'data' => $user], 200);
+        if (!$otp) {
+            return response()->json(['message' => 'The entered OTP is invalid!'], 400);
         }
-        return response()->json(['message' => 'Something went wrong!'], 400);
+
+        try {
+            DB::beginTransaction();
+            $user = new User($request->only(
+                'Name',
+                'Mobile_number',
+                'Email',
+                'District',
+                'ULB_Name',
+                'Secretariat_number',
+                'username',
+            ));
+
+            $user->password = Hash::make($request->input('password'));
+            $user->Status = 1;
+            $user->save();
+            $otp->delete();
+            DB::commit();
+            return response()->json(['message' => 'Successfully registered!', 'data' => $user], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Something went wrong!'], 400);
+        }
+    }
+
+    /**
+     * Send the OTP to Mobile number
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function createOTP(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'Mobile_number' => 'bail|required|string|min:10|max:10',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        $otp = Otp::updateOrCreate([
+            'type' => 2,
+            'phone_number' => $request->input('Mobile_number'),
+        ], [
+            'expires_at' => now()->addMinute(15),
+            'otp' => CommonRepository::genrateRandomNumber()
+        ]);
+
+        // Send message
+        $message = "Please verify your phone number using the OTP: {$otp->otp}.";
+        SendTextMessageJob::dispatch($request->input('Mobile_number'), $message);
+        return response()->json(['message' => 'OTP has been sent successfully!', 'data' => $otp]);
+    }
+
+    /**
+     * Verify the OTP
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function verifyOTP(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'Mobile_number' => 'bail|required|string|min:10|max:10',
+            'otp' => 'bail|required|integer|min:111111|max:999999',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        $otp = Otp::where('phone_number', $request->input('Mobile_number'))
+            ->where('otp', $request->input('otp'))
+            ->where('type', 2)
+            ->first();
+
+        if (!$otp) {
+            return response()->json(['message' => 'The entered OTP is invalid!'], 400);
+        }
+
+        return response()->json(['message' => 'OTP has been verified!', 'data' => $otp]);
     }
 }
