@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,6 +36,10 @@ class SendTextMessageJob implements ShouldQueue
      */
     public function handle()
     {
-        Twilio::message("+91" . $this->phone_number, $this->message);
+        try {
+            Twilio::message("+91" . $this->phone_number, $this->message);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
