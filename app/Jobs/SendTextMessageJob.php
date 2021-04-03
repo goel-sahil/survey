@@ -37,7 +37,7 @@ class SendTextMessageJob implements ShouldQueue
     public function handle()
     {
         try {
-            // Twilio::message("+91" . $this->phone_number, $this->message);
+            Twilio::message("+91" . $this->phone_number, $this->message);
         } catch (Exception $e) {
             return false;
         }

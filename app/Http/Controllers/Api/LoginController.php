@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -15,43 +17,25 @@ class LoginController extends Controller
      */
     function login(Request $request)
     {
+        $user = User::where('username', $request->input('username'))->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'These credentials do not match our records.!'], 400);
+        }
+
+        if (!Hash::check($request->input('password'), $user->password)) {
+            return response()->json(['message' => 'These credentials do not match our records.!'], 400);
+        }
+
+        if ($user->Status == 0) {
+            return response()->json(['message' => 'Your account is not verified.!'], 400);
+        }
+
         $token = auth()->attempt($request->only('username', 'password'));
         if ($token) {
             return $this->respondWithToken($token);
         }
         return response()->json(['message' => 'These credentials do not match our records.!'], 400);
-    }
-
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me()
-    {
-        return response()->json(auth()->user());
-    }
-
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout()
-    {
-        auth()->logout();
-
-        return response()->json(['message' => 'Successfully logged out'], 200);
-    }
-
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
-    {
-        return $this->respondWithToken(auth()->refresh());
     }
 
     /**
