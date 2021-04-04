@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // Login
 Route::post('register', [RegisterController::class, 'register']);
-Route::post('register/resend-otp', [RegisterController::class, 'resendOTP']);
+Route::post('register/otp', [RegisterController::class, 'createOTP']);
 Route::post('register/verify-otp', [RegisterController::class, 'verifyOTP']);
 Route::post('login', [LoginController::class, 'login']);
 
